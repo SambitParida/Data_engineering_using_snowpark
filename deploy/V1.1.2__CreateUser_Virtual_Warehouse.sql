@@ -13,7 +13,7 @@ SCALING_POLICY = 'STANDARD';
 
 USE ROLE USERADMIN;
 
-CREATE USER SNOWPARK_USER
+CREATE OR REPLACE USER SNOWPARK_USER
 PASSWORD = 'test@1234'
 comment = 'This user is created to use snowpark'
 default_role = SYSADMIN
