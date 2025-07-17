@@ -1,0 +1,46 @@
+name: swiggy-pipeline-schema-change-demo
+
+# Triggers the action based on branch and path. 
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'deploy/**'
+
+  workflow_dispatch:
+
+jobs:
+  schema-change-job:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your jo b can access it
+      - name: Retrieve repository
+        uses: actions/checkout@v2
+
+      - name: Use Python 3.8.x
+        uses: actions/setup-python@v2.2.1
+        with:
+          python-version: 3.8.x
+      - name: Execute schemachange
+        env:
+          SF_ACCOUNT: ${{ secrets.SF_ACCOUNT }}
+          SF_USERNAME: ${{ secrets.SF_USERNAME }}
+          SF_ROLE: ${{ secrets.SF_ROLE }}
+          SF_WAREHOUSE: ${{ secrets.SF_WAREHOUSE }}
+          SF_DATABASE: ${{ secrets.SF_DATABASE }}
+          SNOWFLAKE_PASSWORD: ${{ secrets.SF_PASSWORD }}
+        run: |
+          echo "GITHUB_WORKSPACE: $GITHUB_WORKSPACE"
+          echo "SF_USERNAME: $SF_USERNAME"
+          echo "SF_ROLE: $SF_ROLE"
+          echo "SF_WAREHOUSE: $SF_WAREHOUSE"
+          echo "SF_DATABASE: $SF_DATABASE"
+         
+          python --version
+          echo "Step 1 : Installing SchemaChange"
+          pip install schemachange
+
+          echo "Step 2 : Running SchemaChange"
+          schemachange -f $GITHUB_WORKSPACE/deploy -a $SF_ACCOUNT -u $SF_USERNAME -r $SF_ROLE -w $SF_WAREHOUSE -d $SF_DATABASE -c $SF_DATABASE.SCHEMACHANGE.CHANGE_HISTORY --create-change-history-table
