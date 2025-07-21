@@ -6,7 +6,7 @@ USE DATABASE SALES_DWH;
 USE SCHEMA COMMON_SALES;
 
 create or replace transient table exchange_rate(
-    date date, 
+    exchange_date date, 
     usd2usd decimal(10,7),
     usd2eu decimal(10,7),
     usd2can decimal(10,7),
