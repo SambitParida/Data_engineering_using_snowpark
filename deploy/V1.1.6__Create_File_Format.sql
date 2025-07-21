@@ -3,7 +3,7 @@ USE ROLE SYSADMIN;
 USE DATABASE SALES_DWH;
 -- CREATE SCHEMAS --
 
-USE SCHEMA common;
+USE SCHEMA COMMON_SALES;
 create or replace file format csv_format
     type = csv, 
     field_delimiter = ',',
