@@ -36,7 +36,7 @@ def traverse_directory(directory, file_extension) -> list:
 
 
 def main():
-    directory_path = r"/Users/sambitparida/Desktop/Sambit/Learning/SnowflakePractice/data/amazon_sales_data/sales/"
+    directory_path = r"/Users/sambitparida/Desktop/Sambit/Learning/SnowflakePractice/data/amazon_sales_data"
     csv_file_name, csv_partition_dir , csv_local_file_path= traverse_directory(directory_path,'.csv')
     parquet_file_name, parquet_partition_dir , parquet_local_file_path= traverse_directory(directory_path,'.parquet')
     json_file_name, json_partition_dir , json_local_file_path= traverse_directory(directory_path,'.json')
