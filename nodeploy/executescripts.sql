@@ -22,7 +22,7 @@ SELECT T.$1::TEXT AS ORDER_ID,
     T.$14::TEXT AS PAYMENT_PROVIDER,
     T.$15::TEXT AS MOBILE,
     T.$16::TEXT AS SHIPPING_ADDRESS
-FROM @MY_INTERNAL_STG / SALES / SOURCE = IN / FORMAT = CSV / (FILE_FORMAT => 'SALES_DWH.SOURCE.CSV_FORMAT') T;
+FROM @MY_INTERNAL_STG/sales/source=IN/format=csv/(FILE_FORMAT => 'SALES_DWH.COMMON_SALES.CSV_FORMAT') T;
 -- INTERNAL STAGE - QUERY THE PARQUET DATA FILE FORMAT
 SELECT $1 :"ORDER ID"::TEXT AS ORDE_ID,
     $1 :"CUSTOMER NAME"::TEXT AS CUSTOMER_NAME,
@@ -68,6 +68,47 @@ SELECT T.$1::DATE AS EXCHANGE_DT,
     TO_DECIMAL(T.$5, 18, 10) AS USD2UK,
     TO_DECIMAL(T.$6, 18, 10) AS USD2INR,
     TO_DECIMAL(T.$7, 18, 10) AS USD2JP
-FROM @SALES_DWH.SOURCE.MY_INTERNAL_STG / EXCHANGE - RATE - DATA.CSV (
+FROM @SALES_DWH.SOURCE.MY_INTERNAL_STG/exchange-rate-data.csv  (
         FILE_FORMAT => 'SALES_DWH.COMMON_SALES.CSV_FORMAT'
-    ) T;
+    )T;
+
+
+use schema common_sales;
+SELECT *
+FROM INFORMATION_SCHEMA.LOAD_HISTORY
+WHERE TABLE_NAME = 'EXCHANGE_RATE'
+ORDER BY LAST_LOAD_TIME DESC
+LIMIT 10;
+
+
+copy into sales_dwh.source.in_sales_order from (
+    select
+        in_sales_order_seq.nextval as sales_order_key,
+        t.$1 as ORDER_ID,
+        t.$2 as CUSTOMER_NAME,
+        t.$3 as MOBILE_KEY,
+        t.$4 as ORDER_QUENTITY,
+        t.$5 as UNIT_PRICE,
+        t.$6 as ORDER_VALUE,
+        t.$7 as PROMOTION_CODE,
+        t.$8 as FINAL_ORDER_AMOUNT,
+        t.$9 as tax_amount,
+        t.$10 as ORDER_DT,
+        t.$11 as PAYMENT_STATUS,
+        t.$12 as SHIPPING_STATUS,
+        t.$13 as payment_method,
+        t.$14 as PAYMENT_PROVIDER,
+        t.$15 as MOBILE,
+        t.$16 as SHIPPING_ADDRESS,
+        metadata$filename as STG_FILE_NAME,
+        metadata$file_row_number as STG_ROW_NUMBER,
+        metadata$file_last_modified as STG_LAST_MODIFIED
+    from 
+    @sales_dwh.source.MY_INTERNAL_STG/sales/source=IN/format=csv/
+    (
+        file_format => 'sales_dwh.common_sales.csv_format'
+    ) t
+) on_error = 'ABORT_STATEMENT'
+
+
+truncate table sales_dwh.source.in_sales_order
