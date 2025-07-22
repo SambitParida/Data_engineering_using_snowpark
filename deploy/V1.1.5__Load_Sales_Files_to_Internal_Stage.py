@@ -1,4 +1,5 @@
 from snowflake.snowpark import Session
+from dotenv import load_dotenv
 import os
 import sys
 import logging
@@ -8,16 +9,17 @@ import logging
 #logging.basicConfig(stream=sys.stdout, level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', datefmt = '%I:%M:%S' ) 
 
 def get_snowpark_session() -> Session:
-    connection_parameters = {
-        "ACCOUNT":"LRAAQHX-WNC77439",
-        "USER":"SNOWPARK_USER",
-        "PASSWORD":"TEST@1234",
-        "ROLE":"SYSADMIN",
-        "DATABASE":"SALES_DWH",
-        "SCHEMA":"CURATED",
-        "WAREHOUSE":"SNOWPARK_ETL_WH"
-    }
-    return Session.builder.configs(connection_parameters).create()
+        load_dotenv()
+        connection_parameters = {
+            "account": os.getenv("SNOWFLAKE_ACCOUNT"),
+            "user": os.getenv("SNOWFLAKE_USER"),
+            "password": os.getenv("SNOWFLAKE_PASSWORD"),
+            "warehouse": os.getenv("SNOWFLAKE_WAREHOUSE"),
+            "database": os.getenv("SNOWFLAKE_DATABASE"),
+            "schema": os.getenv("SNOWFLAKE_SCHEMA"),
+            "role": os.getenv("SNOWFLAKE_ROLE")
+        }
+        return Session.builder.configs(connection_parameters).create()
 
 
 def traverse_directory(directory, file_extension) -> list:
@@ -81,4 +83,5 @@ def main():
     
 if __name__ == '__main__':
     main()
+
 
