@@ -40,27 +40,27 @@ SELECT $1 :"ORDER ID"::TEXT AS ORDE_ID,
     $1 :"PAYMENT PROVIDER"::TEXT AS PAYMENT_PROVIDER,
     $1 :"PHONE"::TEXT AS PHONE,
     $1 :"DELIVERY ADDRESS"::TEXT AS SHIPPING_ADDRESS
-FROM @MY_INTERNAL_STG / SALES / SOURCE = US / FORMAT = PARQUET / (
+FROM @MY_INTERNAL_STG/SALES/ SOURCE = US / FORMAT = PARQUET / (
         FILE_FORMAT => 'SALES_DWH.SOURCE.MY_PARQUET_FORMAT'
     );
 -- INTERNAL STAGE - QUERY THE JSON DATA FILE FORMAT
-SELECT $1 :"ORDER ID"::TEXT AS ORDE_ID,
-    $1 :"CUSTOMER NAME"::TEXT AS CUSTOMER_NAME,
-    $1 :"MOBILE MODEL"::TEXT AS MOBILE_KEY,
-    TO_NUMBER($1 :"QUANTITY") AS QUANTITY,
-    TO_NUMBER($1 :"PRICE PER UNIT") AS UNIT_PRICE,
-    TO_DECIMAL($1 :"TOTAL PRICE") AS TOTAL_PRICE,
-    $1 :"PROMOTION CODE"::TEXT AS PROMOTION_CODE,
-    $1 :"ORDER AMOUNT"::NUMBER(10, 2) AS ORDER_AMOUNT,
-    TO_DECIMAL($1 :"TAX") AS TAX,
-    $1 :"ORDER DATE"::DATE AS ORDER_DT,
-    $1 :"PAYMENT STATUS"::TEXT AS PAYMENT_STATUS,
-    $1 :"SHIPPING STATUS"::TEXT AS SHIPPING_STATUS,
-    $1 :"PAYMENT METHOD"::TEXT AS PAYMENT_METHOD,
-    $1 :"PAYMENT PROVIDER"::TEXT AS PAYMENT_PROVIDER,
-    $1 :"PHONE"::TEXT AS PHONE,
-    $1 :"DELIVERY ADDRESS"::TEXT AS SHIPPING_ADDRESS
-FROM @SALES_DWH.SOURCE.MY_INTERNAL_STG / SALES / SOURCE = FR / FORMAT = JSON / (FILE_FORMAT => SALES_DWH.SOURCE.MY_JSON_FORMAT);
+SELECT     $1:"Order ID"::text as orde_id,                   
+    $1:"Customer Name"::text as customer_name,          
+    $1:"Mobile Model"::text as mobile_key,              
+    to_number($1:"Quantity") as quantity,               
+    to_number($1:"Price per Unit") as unit_price,       
+    to_decimal($1:"Total Price") as total_price,        
+    $1:"Promotion Code"::text as promotion_code,        
+    $1:"Order Amount"::number(10,2) as order_amount,    
+    to_decimal($1:"Tax") as tax,                        
+    $1:"Order Date"::date as order_dt,                  
+    $1:"Payment Status"::text as payment_status,        
+    $1:"Shipping Status"::text as shipping_status,      
+    $1:"Payment Method"::text as payment_method,        
+    $1:"Payment Provider"::text as payment_provider,    
+    $1:"Phone"::text as phone,                          
+    $1:"Delivery Address"::text as shipping_address
+FROM @SALES_DWH.SOURCE.MY_INTERNAL_STG/sales/source=FR/format=json/(FILE_FORMAT => SALES_DWH.COMMON_SALES.MY_JSON_FORMAT);
 SELECT T.$1::DATE AS EXCHANGE_DT,
     TO_DECIMAL(T.$2) AS USD2USD,
     TO_DECIMAL(T.$3, 18, 10) AS USD2EU,
@@ -111,4 +111,59 @@ copy into sales_dwh.source.in_sales_order from (
 ) on_error = 'ABORT_STATEMENT'
 
 
-truncate table sales_dwh.source.in_sales_order
+  select 
+        sales_dwh.source.us_sales_order_seq.nextval as SALES_ORDER_KEY,
+        $1:"Order ID"::text as orde_id,   
+        $1:"Customer Name"::text as customer_name,
+        $1:"Mobile Model"::text as mobile_key,
+        to_number($1:"Quantity") as quantity,
+        to_number($1:"Price per Unit") as unit_price,
+        to_decimal($1:"Total Price") as total_price,
+        $1:"Promotion Code"::text as promotion_code,
+        $1:"Order Amount"::number(10,2) as order_amount,
+        to_decimal($1:"Tax") as tax,
+        $1:"Order Date"::date as order_dt,
+        $1:"Payment Status"::text as payment_status,
+        $1:"Shipping Status"::text as shipping_status,
+        $1:"Payment Method"::text as payment_method,
+        $1:"Payment Provider"::text as payment_provider,
+        $1:"Phone"::text as phone,
+        $1:"Delivery Address"::text as shipping_address,
+        metadata$filename as STG_FILE_NAME,                 
+        metadata$file_row_number as STG_ROW_NUMBER,         
+        metadata$file_last_modified as STG_LAST_MODIFIED    
+    from            
+    @sales_dwh.source.MY_INTERNAL_STG/sales/source=FR/format=json/
+    (
+        file_format => 'sales_dwh.common_sales.my_json_format'
+    ) t
+
+
+copy into sales_dwh.source.fr_sales_order from ( 
+    select 
+        sales_dwh.source.fr_sales_order_seq.nextval as SALES_ORDER_KEY,
+        $1:"Order ID"::text as orde_id,   
+        $1:"Customer Name"::text as customer_name,
+        $1:"Mobile Model"::text as mobile_key,
+        to_number($1:"Quantity") as quantity,
+        to_number($1:"Price per Unit") as unit_price,
+        to_decimal($1:"Total Price") as total_price,
+        $1:"Promotion Code"::text as promotion_code,
+        $1:"Order Amount"::number(10,2) as order_amount,
+        to_decimal($1:"Tax") as tax,
+        $1:"Order Date"::date as order_dt,
+        $1:"Payment Status"::text as payment_status,
+        $1:"Shipping Status"::text as shipping_status,
+        $1:"Payment Method"::text as payment_method,
+        $1:"Payment Provider"::text as payment_provider,
+        $1:"Phone"::text as phone,
+        $1:"Delivery Address"::text as shipping_address,
+        metadata$filename as STG_FILE_NAME,                 
+        metadata$file_row_number as STG_ROW_NUMBER,         
+        metadata$file_last_modified as STG_LAST_MODIFIED    
+    from            
+    @sales_dwh.source.MY_INTERNAL_STG/sales/source=FR/format=json/
+    (
+        file_format => 'sales_dwh.common_sales.my_json_format'
+    ) t
+) on_error = 'ABORT_STATEMENT' 

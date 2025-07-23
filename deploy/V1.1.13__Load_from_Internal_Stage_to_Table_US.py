@@ -54,7 +54,16 @@ def ingest_us_sales(session) -> None:
      ).collect()
 def main():
     session = get_snowpark_session()
+    
+    print ("<US sales order> : Before Copy")
+    session.sql("select count (*) from sales_dwh.source.us_sales_order").show()
+
     ingest_us_sales(session)
+
+    print ("<US sales order> : After Copy")
+
+    session.sql("select count (*) from sales_dwh.source.us_sales_order").show()
+
 
 if __name__ == '__main__':
     main()
