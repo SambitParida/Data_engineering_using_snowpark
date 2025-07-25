@@ -9,7 +9,8 @@ create or replace  table region_dim(
     region_id_pk number primary key,
     Country text, 
     Region text,
-    isActive text(1)
+    isActive text(1),
+    hash_key number
 );
 create or replace  table product_dim(
     product_id_pk number primary key,
@@ -18,13 +19,16 @@ create or replace  table product_dim(
     Model text,
     Color text,
     Memory text,
-    isActive text(1)
+    HDD text,
+    isActive text(1),
+    hash_key number
 );
 
 create or replace  table promo_code_dim(
     promo_code_id_pk number primary key,
     promo_code text,
-    isActive text(1)
+    isActive text(1),
+    hash_key number
 );
 
 create or replace  table customer_dim(
@@ -34,7 +38,8 @@ create or replace  table customer_dim(
     SHIPPING_ADDRESS text,
     country text,
     region text,
-    isActive text(1)
+    isActive text(1),
+    hash_key number
 );
 
 create or replace  table payment_dim(
@@ -43,7 +48,8 @@ create or replace  table payment_dim(
     PAYMENT_PROVIDER text,
     country text,
     region text,
-    isActive text(1)
+    isActive text(1),
+    hash_key number
 );
 
 create or replace  table date_dim(
@@ -56,7 +62,8 @@ create or replace  table date_dim(
     order_dayofweek int,
     order_dayname text,
     order_dayofmonth int,
-    order_weekday text
+    order_weekday text,
+    hash_key number
 );
 
 create or replace table sales_fact (
@@ -73,5 +80,6 @@ create or replace table sales_fact (
  local_tax_amt number(10,2),
  exhchange_rate number(15,7),
  us_total_order_amt number(23,8),
- usd_tax_amt number(23,8)
+ usd_tax_amt number(23,8),
+ hash_key number
 );
