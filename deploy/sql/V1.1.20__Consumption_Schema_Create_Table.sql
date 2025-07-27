@@ -82,6 +82,5 @@ create or replace table sales_fact (
  local_tax_amt number(10,2),
  exhchange_rate number(15,7),
  us_total_order_amt number(23,8),
- usd_tax_amt number(23,8),
- hash_key number
+ usd_tax_amt number(23,8)
 );
