@@ -167,3 +167,47 @@ copy into sales_dwh.source.fr_sales_order from (
         file_format => 'sales_dwh.common_sales.my_json_format'
     ) t
 ) on_error = 'ABORT_STATEMENT' 
+
+-----
+
+SELECT "SALES_ORDER_KEY",
+    "ORDER_ID",
+    "ORDER_DT",
+    "CUSTOMER_NAME",
+    "MOBILE_KEY",
+    "COUNTRY",
+    "REGION",
+    "ORDER_QUANTITY",
+    "LOCAL_CURRENCY",
+    "LOCAL_UNIT_PRICE",
+    "PROMOTION_CODE",
+    "LOCAL_TOTAL_ORDER_AMT",
+    "LOCAL_TAX_AMT",
+    "EXHCHANGE_RATE",
+    "US_TOTAL_ORDER_AMT",
+    "USD_TAX_AMT",
+    "PAYMENT_STATUS",
+    "SHIPPING_STATUS",
+    "PAYMENT_METHOD",
+    "PAYMENT_PROVIDER",
+    "CONCTACT_NO",
+    "SHIPPING_ADDRESS",
+    split("MOBILE_KEY", '/')[0] AS "BRAND",
+    split("MOBILE_KEY", '/')[1] AS "MODEL",
+    split("MOBILE_KEY", '/')[2] AS "COLOR"
+FROM (
+        select *
+        from curated.fr_sales_order
+        union
+        select *
+        from curated.in_sales_order
+        union
+        select *
+        from curated.us_sales_order
+    )
+LIMIT 1;
+
+
+
+SELECT *
+FROM TABLE(INFORMATION_SCHEMA.QUERY_HISTORY())
