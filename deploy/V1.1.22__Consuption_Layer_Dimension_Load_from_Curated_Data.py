@@ -141,7 +141,8 @@ def main():
         create_promo_code_dim(sales_df,session) 
         create_customer_dim(sales_df,session)
         create_payment_dim(sales_df,session)
-                           
+        
+        session.close()
 
 if __name__ == '__main__':
     main()

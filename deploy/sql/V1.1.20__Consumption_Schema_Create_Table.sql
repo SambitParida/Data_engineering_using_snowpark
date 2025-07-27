@@ -27,6 +27,8 @@ create or replace  table product_dim(
 create or replace  table promo_code_dim(
     promo_code_id_pk number primary key,
     promo_code text,
+    Country text, 
+    Region text,
     isActive text(1),
     hash_key number
 );
@@ -56,7 +58,7 @@ create or replace  table date_dim(
     date_id_pk int primary key,
     order_dt date,
     order_year int,
-    oder_month int,
+    order_month int,
     order_quater int,
     order_day int,
     order_dayofweek int,
