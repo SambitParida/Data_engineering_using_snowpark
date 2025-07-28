@@ -39,7 +39,6 @@ def traverse_directory(directory, file_extension) -> list:
 
 def main():
     load_dotenv()
-    #directory_path = r"/Users/sambitparida/Desktop/Sambit/Learning/SnowflakePractice/data/amazon_sales_data"
     directory_path=os.getenv("directory_path")
     csv_file_name, csv_partition_dir , csv_local_file_path= traverse_directory(directory_path,'.csv')
     parquet_file_name, parquet_partition_dir , parquet_local_file_path= traverse_directory(directory_path,'.parquet')
